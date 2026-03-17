@@ -1,0 +1,6 @@
+@Core_Providentia_vitae_HostAddress = http://localhost:5192
+
+GET {{Core_Providentia_vitae_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
