@@ -1,7 +1,7 @@
-# PROVIDENTIA VITAE
+#  VITAE
 ### 📋 Sobre o Projeto
 
-O PROVIDENTIA VITAE é um sistema modular desenvolvido para atender as necessidades do Hospital Santa Casa de Misericórdia de Sobral, substituindo o sistema legado atual.
+O VITAE é um sistema modular desenvolvido para atender as necessidades do Hospital Santa Casa de Misericórdia de Sobral, substituindo o sistema legado atual.
 🎯 Objetivos
 
     Modernização: Substituir sistema legado por tecnologia atual
