@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Core_Providentia_vitae.Services.Admin.Modules;
 using Core_Providentia_vitae.DTO.Modules;
 using Core_Providentia_vitae.Models.Admin;
+using Azure;
 
 namespace Core_Providentia_vitae.Controllers.Modules;
 
@@ -29,7 +30,7 @@ public class ModulesController : ControllerBase
         var response = new
         {
             Data = modulos,
-            Paginationa = new
+            Pagination = new
             {
                 CurrentPage = page,
                 PageSize = pageSize,
@@ -44,19 +45,29 @@ public class ModulesController : ControllerBase
         return Ok(response);
     }
 
+    [HttpGet("getModulos/{id}")]
+    public async Task<ActionResult<CreateModuleDto>> GetModulosId(
+    uint id
+)
+    {
+        var modulos = await _modulesService.GetModulesId(id);
+
+        return Ok(modulos);
+    }
+
     [HttpPost("cadastrarModulos")]
     public async Task<ActionResult<CreateModuleDto>> CreateModules(CreateModuleDto dto)
     {
         return Ok(await _modulesService.createModule(dto));
     }
 
-    [HttpPut("updateModulos")]
+    [HttpPatch("updateModulos/{id}")]
     public async Task<ActionResult<UpdateModulesDto>> UpdateModules(uint id, UpdateModulesDto dto)
     {
         return Ok(await _modulesService.updateModules(id, dto));
     }
 
-    [HttpDelete("deletarModulos")]
+    [HttpDelete("deletarModulos/{id}")]
     public async Task<ActionResult<Modulo>> DeleteUsuario(uint id)
     {
         try
@@ -109,13 +120,37 @@ public class ModulesController : ControllerBase
         return Ok(await _modulesService.CreatePerfil(perfil));
     }
 
-    [HttpGet("perfil")]
-    public async Task<ActionResult<Perfil>> GetPerfil()
+    [HttpGet("perfil/{id}")]
+    public async Task<ActionResult<Perfil>> GetPerfil(uint id)
     {
-        return Ok(await _modulesService.GetPerfil());
+        return Ok(await _modulesService.GetPerfilById(id));
     }
 
-    [HttpDelete("perfil")]
+[HttpGet("perfil")]
+    public async Task<ActionResult<Perfil>> GetPerfil(int page = 1,
+        [FromQuery] int pageSize = 10
+    )
+    {
+        // return await _modulesService.GetMenusAsync(menus);
+        var (perfil, totalCount, totalPages) = await _modulesService.GetPerfilAsync(page, pageSize);
+        var response = new
+        {
+            Data = perfil,
+            Pagination = new
+            {
+                CurrentPage = page,
+                PageSize = pageSize,
+                TotalItems = totalCount,
+                TotalPages = totalPages,
+                HasNextPage = page < totalPages,
+                HasPreviousPage = page > 1
+            }
+        };
+
+        return Ok(response);
+    }
+
+    [HttpDelete("perfil/{id}")]
     public async Task<ActionResult<bool>> DeletePerfil(uint id)
     {
         var response = await _modulesService.DeletePerfil(id);
@@ -129,42 +164,156 @@ public class ModulesController : ControllerBase
         }
     }
 
-   [HttpPatch("perfil/{id}")]  // 👈 ID na rota
-public async Task<ActionResult<UpdatePerfilDto>> UpdatePerfil(
-    uint id, 
-    [FromBody] UpdatePerfilDto updatePerfilDto) 
-{
-    try
+    [HttpPatch("perfil/{id}")]  // 👈 ID na rota
+    public async Task<ActionResult<UpdatePerfilDto>> UpdatePerfil(
+     uint id,
+     [FromBody] UpdatePerfilDto updatePerfilDto)
     {
-        if (updatePerfilDto == null)
-            return BadRequest("Dados inválidos");
-        
-        var perfilAtualizado = await _modulesService.UpdatePerfil(id, updatePerfilDto);
-        
-        if (perfilAtualizado == null)
-            return NotFound($"Perfil com ID {id} não encontrado");
-        
-        return Ok(perfilAtualizado);
-    }
-    catch (KeyNotFoundException ex)
-    {
-        return NotFound(ex.Message);
-    }
-    catch (DbUpdateException ex)
-    {
-        Console.WriteLine($"Erro de banco: {ex.Message}");
-        return StatusCode(500, "Erro ao salvar no banco de dados");
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Erro inesperado: {ex.Message}");
-        return StatusCode(500, "Erro interno no servidor");
-    }
-}
+        try
+        {
+            if (updatePerfilDto == null)
+                return BadRequest("Dados inválidos");
 
+            var perfilAtualizado = await _modulesService.UpdatePerfil(id, updatePerfilDto);
 
-    // Cadastro de MenuModulo
+            if (perfilAtualizado == null)
+                return NotFound($"Perfil com ID {id} não encontrado");
 
+            return Ok(perfilAtualizado);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (DbUpdateException ex)
+        {
+            Console.WriteLine($"Erro de banco: {ex.Message}");
+            return StatusCode(500, "Erro ao salvar no banco de dados");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Erro inesperado: {ex.Message}");
+            return StatusCode(500, "Erro interno no servidor");
+        }
+    }
+
+    // CADASTRO DOS MÓDULOS
+    [HttpPost("menus")]
+    public async Task<ActionResult<Menu>> CreateMenuAsync(Menu menus)
+    {
+        try
+        {
+            if (menus == null)
+                return BadRequest("Dados inválidos");
+
+            if (string.IsNullOrEmpty(menus.nmMenu))
+                return BadRequest("Nome do menu é obrigatório");
+
+            var menuCriado = await _modulesService.CreateMenus(menus);
+
+            // Retorna 201 Created (mais semântico que 200)
+            return CreatedAtAction(nameof(GetMenusId), new { id = menuCriado.Id }, menuCriado);
+        }
+        catch (Exception ex)
+        {
+            // Log pra você ver o erro
+            Console.WriteLine($"Erro ao criar menu: {ex.Message}");
+            return StatusCode(500, "Erro interno ao criar menu");
+        }
+    }
+
+    [HttpGet("menus")]
+    public async Task<ActionResult<GetMenusDto>> GetMenusAsync([FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10
+    )
+    {
+        // return await _modulesService.GetMenusAsync(menus);
+        var (menu, totalCount, totalPages) = await _modulesService.GetMenusAsync(page, pageSize);
+        var response = new
+        {
+            Data = menu,
+            Pagination = new
+            {
+                CurrentPage = page,
+                PageSize = pageSize,
+                TotalItems = totalCount,
+                TotalPages = totalPages,
+                HasNextPage = page < totalPages,
+                HasPreviousPage = page > 1
+            }
+        };
+
+        return Ok(response);
+    }
+
+      [HttpGet("menus/{id}")]
+    public async Task<ActionResult<GetMenusDto>> GetMenusId(uint id)
+    {
+        // return await _modulesService.GetMenusAsync(menus);
+        var menu = await _modulesService.GetMenusId(id);
+    
+
+        return Ok(menu);
+    }
+
+    [HttpPatch("menus/{id}")]
+    public async Task<ActionResult<CreateMenusDto>> EditMenus(
+     uint id,
+     [FromBody] CreateMenusDto updateMenus)
+    {
+        try
+        {
+            if (updateMenus == null)
+                return BadRequest("Dados inválidos");
+
+            var perfilAtualizado = await _modulesService.EditMenusId(id, updateMenus);
+
+            if (perfilAtualizado == null)
+                return NotFound($"Menu com ID {id} não encontrado");
+
+            return Ok(perfilAtualizado);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (DbUpdateException ex)
+        {
+            Console.WriteLine($"Erro de banco: {ex.Message}");
+            return StatusCode(500, "Erro ao salvar no banco de dados");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Erro inesperado: {ex.Message}");
+            return StatusCode(500, "Erro interno no servidor");
+        }
+    }
+
+    // CRIAR VINCULOS MENUS E MODULOS
+    [HttpPost("menumodulo")]
+    public async Task<ActionResult<MenuModuloDTO>> VinculoMenuModulo(MenuModuloDTO menuModulo)
+    {
+          try
+        {
+            if (menuModulo == null)
+                return BadRequest("Dados inválidos");
+
+            // if (string.IsNullOrEmpty(menus.nmMenu))
+            //     return BadRequest("Nome do menu é obrigatório");
+
+            var vinculo = await _modulesService.VinculoMenuModuloAsync(menuModulo);
+
+            // Retorna 201 Created (mais semântico que 200)
+            // return CreatedAtAction(nameof(GetMenusId), new { id = menuCriado.Id }, menuCriado);
+            return Ok(vinculo);
+        }
+        catch (Exception ex)
+        {
+            // Log pra você ver o erro
+            Console.WriteLine($"Erro ao vincular menu: {ex.Message}");
+            return StatusCode(500, "Erro interno ao vincular menu");
+        }
+    }
 
 
 }

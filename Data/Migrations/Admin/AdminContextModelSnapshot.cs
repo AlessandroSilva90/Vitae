@@ -240,7 +240,7 @@ namespace Core_Providentia_vitae.Data.Migrations.Admin
 
                     b.HasKey("Id");
 
-                    b.ToTable("Usuario");
+                    b.ToTable("Usuario", (string)null);
                 });
 
             modelBuilder.Entity("Core_Providentia_vitae.Models.Admin.MenuModulo", b =>

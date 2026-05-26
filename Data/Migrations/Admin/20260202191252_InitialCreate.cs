@@ -34,7 +34,7 @@ namespace Core_Providentia_vitae.Data.Migrations.Admin
                 .Annotation("Relational:Collation", "utf8mb4_0900_ai_ci");
 
             migrationBuilder.CreateTable(
-                name: "Usuario",
+                name: "Usuarios",
                 columns: table => new
                 {
                     id = table.Column<uint>(type: "int unsigned", nullable: false)
@@ -76,7 +76,7 @@ namespace Core_Providentia_vitae.Data.Migrations.Admin
                     table.ForeignKey(
                         name: "FK_usuario_modulos_Usuario_cd_usuario",
                         column: x => x.cd_usuario,
-                        principalTable: "Usuario",
+                        principalTable: "Usuarios",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -107,7 +107,7 @@ namespace Core_Providentia_vitae.Data.Migrations.Admin
                 name: "usuario_modulos");
 
             migrationBuilder.DropTable(
-                name: "Usuario");
+                name: "Usuarios");
 
             migrationBuilder.DropTable(
                 name: "modulos");

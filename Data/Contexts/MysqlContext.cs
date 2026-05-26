@@ -10,13 +10,13 @@ public partial class MysqlContext : DbContext
     {
     }
 
-    public virtual DbSet<Usuario> Usuarios { get; set; }
+    public virtual DbSet<Usuarios> Usuarios { get; set; }
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         // Suas configurações de modelo aqui (se tiver)
-        modelBuilder.Entity<Usuario>(entity =>
+        modelBuilder.Entity<Usuarios>(entity =>
    {
        entity.HasKey(e => e.Id);
 

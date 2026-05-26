@@ -28,25 +28,76 @@ public class UserService
     // }
 
     // MANEIRA NOVA COM USO DE DTO PARA DADOS ESPECÍFICOS
-    public async Task<List<UsuarioResponseDto>> GetUsuariosAsync()
+    public async Task<(List<UsuarioResponseDto> Usuarios, int TotalCount, int TotalPages)> GetUsuariosAsync(
+        int page = 1,
+        int pageSize = 10
+    )
     {
-        return await _context.Usuarios
+        var totalCount = await _context.Usuarios.CountAsync();
+        var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+
+        if (page < 1) page = 1;
+        if (page > totalPages && totalPages > 0) page = totalPages;
+        var skip = (page - 1) * pageSize;
+
+        var usuario = await _context.Usuarios
             .Select(u => new UsuarioResponseDto
             {
                 Id = u.Id,
                 Nome = u.Nome,
                 Email = u.Email,
                 Cracha = u.Cracha,
-                Snfuncionario = u.Sn_Funcionario,
-                Snativo = u.Sn_Ativo,
+                SnFuncionario = u.Sn_Funcionario,
+                SnAtivo = u.Sn_Ativo,
                 DsUsuario = u.Ds_Usuario
-            })
+            }).Skip(skip)
+            .Take(pageSize)
             .ToListAsync();
+
+        return (usuario, totalCount, totalPages);
     }
 
-    public async Task<Usuario?> GetUsuariosByIdAsync(uint id)
+    public async Task<List<UsuarioResponseDto>?> GetUsuariosByIdAsync(string termo)
     {
-        return await _context.Usuarios.FindAsync(id);
+        var query = _context.Usuarios.AsQueryable();
+
+        // Tenta converter para número (int ou uint)
+        if (int.TryParse(termo, out int numero))
+        {
+            // Se for número, busca por ID OU Crachá
+            query = query.Where(u =>
+                u.Id == numero ||  // ID é string, converte número para string
+                u.Cracha == numero);          // Crachá é numérico
+        }
+        else if (termo.Contains('@'))
+        {
+            // Se tem @, busca por email
+            query = query.Where(u => u.Email.Contains(termo));
+        }
+        else
+        {
+            // Senão, busca por nome
+            query = query.Where(u => u.Nome.Contains(termo));
+        }
+
+        // Pega o PRIMEIRO usuário encontrado (ou null se não achar)
+        var usuario = await query.ToListAsync();
+
+        if (usuario == null)
+            return null;
+            
+        // return usuario;
+        return usuario.Select(u => new UsuarioResponseDto
+    {
+        Id = u.Id,
+        Cracha = u.Cracha,
+        DsUsuario = u.Ds_Usuario,
+        Email = u.Email,
+        Nome = u.Nome,
+        SnAtivo = u.Sn_Ativo,
+        SnFuncionario = u.Sn_Funcionario
+    }).ToList();
+    
     }
 
     //     public async Task<Usuario> CreateUsuario(CreateUsuarioDto dto)
@@ -67,17 +118,19 @@ public class UserService
     //     return usuario;
     // }
 
-    public async Task<Usuario> CreateUsuario(CreateUsuarioDto usuarioDto)
+    public async Task<Usuarios> CreateUsuario(CreateUsuarioDto usuarioDto)
     {
         // Criar o usuário manualmente
-        var usuario = new Usuario
+        var usuario = new Usuarios
         {
             Nome = usuarioDto.Nome,
             Email = usuarioDto.Email,
-            Sn_Funcionario = usuarioDto.Snfuncionario,
+            Sn_Funcionario = usuarioDto.SnFuncionario,
             Ds_Usuario = usuarioDto.DsUsuario,
             Senha = usuarioDto.Senha,
-            Dt_Create = DateTime.Now
+            Dt_Create = DateTime.Now,
+            Cracha = usuarioDto.Cracha
+            
         };
 
         _context.Usuarios.Add(usuario);
@@ -95,7 +148,7 @@ public class UserService
         }
     }
 
-    public async Task<Usuario> UpdateUsuarioAsync(uint id, UpdateUsuarioDto updateDto)
+    public async Task<Usuarios> UpdateUsuarioAsync(uint id, UpdateUsuarioDto updateDto)
     {
         var usuarioExistente = await _context.Usuarios.FindAsync(id);
 
@@ -104,7 +157,7 @@ public class UserService
 
         _mapper.Map(updateDto, usuarioExistente);
 
-        usuarioExistente.Dt_Update = DateTime.Now; // Atualiza data de modificação
+        usuarioExistente.Dt_Update = DateTime.Now;
 
         await _context.SaveChangesAsync();
         return usuarioExistente;

@@ -6,7 +6,7 @@ using Core_Providentia_vitae.Models.Admin;
 
 namespace Core_Providentia_vitae.Models;
 
-public partial class Usuario
+public partial class Usuarios
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)] // DEVE TER ISSO
@@ -16,7 +16,7 @@ public partial class Usuario
     public string Nome { get; set; } = null!;
 
     public string Email { get; set; } = null!;
-    public int Cracha { get; set; }
+    public int? Cracha { get; set; }
 
     public bool? Sn_Ativo { get; set; } = true;
 

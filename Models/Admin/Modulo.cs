@@ -13,11 +13,7 @@ public partial class Modulo
 
     public DateTime? DtCreate { get; set; }
 
+    public virtual ICollection<MenuModulo> MenuModulos { get; set; } = new List<MenuModulo>();
 
-    // RELACIONAMENTO COM USUARIO MODULO
-    public ICollection<UsuarioModulo> UsuarioModulos { get; } = new List<UsuarioModulo>();
-    public virtual ICollection<MenuModulo> MenuModulos { get;} = new List<MenuModulo>();
-        
-
-
+    public virtual ICollection<UsuarioModulo> UsuarioModulos { get; set; } = new List<UsuarioModulo>();
 }

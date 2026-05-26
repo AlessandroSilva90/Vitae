@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace Core_Providentia_vitae.Models.Admin;
@@ -13,10 +13,5 @@ public partial class Menu
 
     public DateTime? DtCreate { get; set; }
 
-
-    // RELACIONAMENTO COM MODULO
-    public ICollection<MenuModulo> MenuModulos { get; } = new List<MenuModulo>();
-
-
-
+    public virtual ICollection<MenuModulo> MenuModulos { get; set; } = new List<MenuModulo>();
 }

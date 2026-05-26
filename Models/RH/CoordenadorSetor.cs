@@ -16,4 +16,8 @@ public partial class CoordenadorSetor
     public DateOnly? DtFim { get; set; }
 
     public DateTime DtCreate { get; set; }
+
+// RELACIONAMENTO COM USUARIOS
+    // public ICollection<Usuario> Usuario { get; } = new List<Usuario>();
 }
+

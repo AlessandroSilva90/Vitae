@@ -34,35 +34,34 @@ public class FuncionariosService
 
     // RETORNAR FUNCIONARIOS COM DTO
     public async Task<List<GetFuncionariosDTO>> GetFuncionariosAsync01(int limite = 10)
-{
-    var query = await _context.Epg
-        .AsNoTracking()
-        .Select(f => new
-        {
-            Funcionario = f,
-            UltimaSep = f.Sep
-                .OrderByDescending(s => s.Data)
-                .FirstOrDefault()
-        })
-        .Select(x => new GetFuncionariosDTO
-        {
-            Id = x.Funcionario.Codigo,
-            Nome = x.Funcionario.Nome,
-            Setor = x.UltimaSep != null ? x.UltimaSep.Lot.Nome : "Sem Setor"
-        })
-        .OrderBy(e => e.Nome)
-        .Take(limite)
-        .ToListAsync();
+    {
+        var query = await _context.Epg
+            .AsNoTracking()
+            .Select(f => new
+            {
+                Funcionario = f,
+                UltimaSep = f.Sep
+                    .OrderByDescending(s => s.Data)
+                    .FirstOrDefault()
+            })
+            .Select(x => new GetFuncionariosDTO
+            {
+                Id = x.Funcionario.Codigo,
+                Nome = x.Funcionario.Nome,
+                Setor = x.UltimaSep != null ? x.UltimaSep.Lot.Nome : "Sem Setor"
+            })
+            .OrderBy(e => e.Nome)
+            .Take(limite)
+            .ToListAsync();
 
-    return query;
-}
+        return query;
+    }
 
 
     public async Task<(List<GetFuncionariosDTO> Funcionarios, int TotalCount, int TotalPages)> GetFuncionariosAsync(
     int page = 1,
     int pageSize = 10)
     {
-
         // CODIGO PARA UM FILTRO
         // if (!string.IsNullOrEmpty(codigoFiltro))
         // {
@@ -72,40 +71,35 @@ public class FuncionariosService
         // }
 
         var query = _context.Epg
-        .AsNoTracking()
-        .Select(f => new
-        {
-            Funcionario = f,
-            UltimaSep = f.Sep
-                .OrderByDescending(s => s.Data)
-                .FirstOrDefault()
-        })
-        .Select(x => new GetFuncionariosDTO
-        {
-            Id = x.Funcionario.Codigo,
-            Nome = x.Funcionario.Nome,
-            Setor = x.UltimaSep != null ? x.UltimaSep.Lot.Nome : "Sem Setor"
-        })
-        .OrderBy(e => e.Nome);
+            .Where(f => f.Sep.Any(ff => ff.EstCodigo == "0001" && ff.EmpCodigo == "0003" && f.DtRescisao == null))
+            .AsNoTracking()
+            .Select(f => new GetFuncionariosDTO
+            {
+                Id = f.Codigo,
+                Nome = f.Nome,
+                Setor = f.Sep
+                    .OrderByDescending(s => s.Data)
+                    .Select(s => s.Lot.Nome)
+                    .FirstOrDefault() ?? "Sem Setor"
+            })
+            .OrderBy(e => e.Nome);
 
-    // Conta total UMA VEZ
-    var totalCount = await query.CountAsync();
+        
+        var totalCount = await query.CountAsync();
+        var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
 
-            var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+        if (totalPages == 0) page = 0;
+        else if (page < 1) page = 1;
+        else if (page > totalPages) page = totalPages;
 
+        var funcionarios = totalCount > 0
+            ? await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync()
+            : new List<GetFuncionariosDTO>();
 
-        if (page < 1) page = 1;
-        if (page > totalPages && totalPages > 0) page = totalPages;
-
-        var skip = (page - 1) * pageSize;
-
-         var funcionarios = await query
-        .Skip((page - 1) * pageSize)
-        .Take(pageSize)
-        .ToListAsync();
-
-
-            return (funcionarios,totalCount, totalPages );
+        return (funcionarios, totalCount, totalPages);
     }
 
     public async Task<GetFuncionariosDTO?> GetFuncionariosCrachaAsync(string cracha)

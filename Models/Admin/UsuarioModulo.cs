@@ -13,7 +13,7 @@ public partial class UsuarioModulo
     public uint CdModulo { get; set; }
 
     // RELACIONAMENTO
-    public virtual Usuario Usuario { get; set; } = null!;
+    public virtual Usuarios Usuario { get; set; } = null!;
     
     public virtual Modulo Modulo { get; set; } = null!;
 }

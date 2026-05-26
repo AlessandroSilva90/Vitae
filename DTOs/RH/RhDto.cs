@@ -1,26 +1,56 @@
 namespace Core_Providentia_vitae.DTO.RH;
 
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
+
 // CREATE
 public class CreateUsuarioDto
 {
-    [Required(ErrorMessage = "Nome é obrigatório")] public string Nome { get; set; } = null!;
+    [Required(ErrorMessage = "Nome é obrigatório")]
+    [MaxLength(100)]
+    public string Nome { get; set; } = null!;
+
+    [Required(ErrorMessage = "Email é obrigatório")]
+    [EmailAddress(ErrorMessage = "Email inválido")]
+    [MaxLength(100)]
     public string Email { get; set; } = null!;
-    [Required] public bool? Snfuncionario { get; set; } = true;
-    [Required] public string DsUsuario { get; set; } = null!;
-    [Required] public string Senha { get; set; } = null!;
+
+    [Required(ErrorMessage = "Usuário é obrigatório")]
+    [MaxLength(50)]
+    public string DsUsuario { get; set; } = null!;
+
+    [Required(ErrorMessage = "Senha é obrigatória")]
+    [MinLength(6, ErrorMessage = "Senha deve ter no mínimo 6 caracteres")]
+    public string Senha { get; set; } = null!;
+
+    public int? Cracha { get; set; } = null!;
+
+    public bool SnFuncionario { get; set; } = true;
+
+    public bool SnAtivo { get; set; } = true;
 }
 
 // UPDATE  
 public class UpdateUsuarioDto
 {
-    // public uint? Id { get; set; }
-    public string? Nome { get; set; } = null!;
-    public string? Ds_Usuario { get; set; } = null!;
-    public int? Cracha { get; set; } = null!;
-    public string? Email { get; set; } = null!;
-    public string? Senha { get; set; } = null!;
-    public bool? Snativo { get; set; } = null!;
+    [MaxLength(100)]
+    public string? Nome { get; set; }
+
+    [EmailAddress(ErrorMessage = "Email inválido")]
+    [MaxLength(100)]
+    public string? Email { get; set; }
+
+    [MaxLength(50)]
+    public string? DsUsuario { get; set; }
+
+    [MinLength(6, ErrorMessage = "Senha deve ter no mínimo 6 caracteres")]
+    public string? Senha { get; set; }
+
+    public int? Cracha { get; set; }
+
+    public bool? SnFuncionario { get; set; }
+
+    public bool? SnAtivo { get; set; }
 }
 
 // RESPONSE
@@ -28,11 +58,15 @@ public class UsuarioResponseDto
 {
     public uint Id { get; set; }
     public string Nome { get; set; } = null!;
-    public int Cracha { get; set; }
     public string Email { get; set; } = null!;
     public string DsUsuario { get; set; } = null!;
-    public bool? Snfuncionario { get; set; }
-    public bool? Snativo { get; set; }
+    public int? Cracha { get; set; }
+    public bool? SnFuncionario { get; set; }
+    public bool? SnAtivo { get; set; }
+    public string? Senha { get; set; }
+    public DateTime? DtCreate { get; set; }
+    public DateTime? DtUpdate { get; set; }
+    public DateTime? DtUltimoAcesso { get; set; }
 }
 
 // FILTER (para busca)
@@ -40,7 +74,9 @@ public class UsuarioFilterDto
 {
     public string? Nome { get; set; }
     public string? Email { get; set; }
-    public bool? Snativo { get; set; }
+    public string? DsUsuario { get; set; }
+    public bool? SnAtivo { get; set; }
+    public bool? SnFuncionario { get; set; }
     public int Page { get; set; } = 1;
     public int PageSize { get; set; } = 20;
 }
@@ -48,9 +84,10 @@ public class UsuarioFilterDto
 // SIMPLE (para selects/dropdowns)
 public class UsuarioSimpleDto
 {
-    public int Id { get; set; }
+    public uint Id { get; set; }
     public string Nome { get; set; } = null!;
     public string Email { get; set; } = null!;
+    public string DsUsuario { get; set; } = null!;
 }
 
 
@@ -152,6 +189,16 @@ public class GetVinculoCoordenadorSetorDTO
     // AQUI EU VOU ASSOCIAR POR OUTRO COTEXTO OU CHAMADA
     public string? NmCoordenador { get; set; }
     public string? NmSetor { get; set; }
+}
 
+public class CreateVinculoCoordenadorSetorDTO
+{
+    [Required(ErrorMessage = "Usuário é obrigatório")]
+    [JsonPropertyName("codigo")]
+    public String? CdCoordenador { get; set; }
+    [Required(ErrorMessage = "Setor é obrigatório")]
+    // public String? CdSetor { get; set; }
+        [JsonPropertyName("itens")]
+     public List<String>? CdSetor { get; set; }
 
 }

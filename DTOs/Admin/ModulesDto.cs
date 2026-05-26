@@ -42,3 +42,26 @@ public class UpdatePerfilDto
     public string? dsPerfil {get;set;} = null!;
     public bool? snAtivo {get;set;} = null!;
 }
+
+// DTO PARA OS MENUS
+public class GetMenusDto
+{
+    public uint id {get;set;} 
+    public string? nmMenu {get;set;} = null!;
+    public bool? snAtivo {get;set;} = true;
+
+}
+
+public class CreateMenusDto
+{
+    public string nmMenu {get;set;} = null!;
+    public bool? snAtivo {get;set;} = true;
+
+}
+
+// VINCULO MENU MODULO
+public class MenuModuloDTO
+{
+    public uint cd_menu {get;set;}
+    public uint cd_modulo{get;set;}
+}

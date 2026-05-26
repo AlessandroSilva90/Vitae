@@ -17,6 +17,7 @@ public partial class MssqlContext : DbContext
     }
 
     public virtual DbSet<Epg> Epg { get; set; }
+    public virtual DbSet<Sep> Sep { get; set; }
     public virtual DbSet<Lot> Setores { get; set; }
     public virtual DbSet<Car> Cargos { get; set; }
 

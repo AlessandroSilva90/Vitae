@@ -58,11 +58,28 @@ public class ModulesService
         // }).ToListAsync();
     }
 
+    public async Task<GetModulesDto?> GetModulesId(uint id)
+    {
+
+        var modulo = await _context.Modulos.FindAsync(id);
+
+        if (modulo == null)
+            return null;
+
+        return new GetModulesDto
+        {
+            nmModulos = modulo.NmModulos,
+            snAtivo = modulo.SnAtivo
+        };
+    }
+
+
     public async Task<Modulo> createModule(CreateModuleDto moduleDto)
     {
         var modulo = new Modulo
         {
-            NmModulos = moduleDto.nmModulos
+            NmModulos = moduleDto.nmModulos,
+            SnAtivo = moduleDto.snAtivo ?? true
         };
 
         _context.Add(modulo);
@@ -195,9 +212,41 @@ public class ModulesService
 
     }
 
-    public async Task<List<Perfil>> GetPerfil()
+    public async Task<Perfil?> GetPerfilById(uint id)
     {
-        return await _context.Perfils.ToListAsync();
+        var perfil = await _context.Perfils.FindAsync(id);
+
+        if (perfil == null)
+        {
+            return null;
+        }
+
+        return perfil;
+    }
+
+ public async Task<(List<Perfil> Perfil, int TotalCount, int TotalPages)> GetPerfilAsync(int page = 1,
+    int pageSize = 10)
+    {
+        var query = _context.Perfils.AsQueryable();
+
+        var totalCount = await _context.Menus.CountAsync();
+
+        var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+
+        if (page < 1) page = 1;
+        if (page > totalPages && totalPages > 0) page = totalPages;
+
+        var skip = (page - 1) * pageSize;
+
+        var perfil = await query.Skip(skip).Take(pageSize)
+        .Select(p => new Perfil
+        {
+            Id = p.Id,
+            DsPerfil= p.DsPerfil,
+            SnAtivo = p.SnAtivo
+        }).ToListAsync();
+
+        return (perfil, totalCount, totalPages);
     }
 
     public async Task<bool> DeletePerfil(uint id)
@@ -220,41 +269,159 @@ public class ModulesService
         }
     }
 
-public async Task<Perfil> UpdatePerfil(uint id, UpdatePerfilDto updatePerfilDto)
-{
-    try
+    public async Task<Perfil> UpdatePerfil(uint id, UpdatePerfilDto updatePerfilDto)
     {
-        
-        var perfil = await _context.Perfils.FindAsync(id);
-        
-        
-        if (perfil == null)
-            throw new KeyNotFoundException($"Perfil com ID {id} não encontrado");
-        
-        
-        if (!string.IsNullOrWhiteSpace(updatePerfilDto.dsPerfil))
-            perfil.DsPefil = updatePerfilDto.dsPerfil;
-            
-        if (updatePerfilDto.snAtivo.HasValue)
-            perfil.SnAtivo = updatePerfilDto.snAtivo;
-        
-        
-        await _context.SaveChangesAsync();
-        
-        
-        return perfil;
-    }
-    catch (KeyNotFoundException)
-    {
-        throw; 
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Erro ao atualizar perfil {id}: {ex.Message}");
-        throw new Exception("Erro interno ao atualizar perfil", ex);
-    }
-}
+        try
+        {
 
+            var perfil = await _context.Perfils.FindAsync(id);
+
+
+            if (perfil == null)
+                throw new KeyNotFoundException($"Perfil com ID {id} não encontrado");
+
+
+            if (!string.IsNullOrWhiteSpace(updatePerfilDto.dsPerfil))
+                perfil.DsPerfil = updatePerfilDto.dsPerfil;
+
+            if (updatePerfilDto.snAtivo.HasValue)
+                perfil.SnAtivo = updatePerfilDto.snAtivo;
+
+
+            await _context.SaveChangesAsync();
+
+
+            return perfil;
+        }
+        catch (KeyNotFoundException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Erro ao atualizar perfil {id}: {ex.Message}");
+            throw new Exception("Erro interno ao atualizar perfil", ex);
+        }
+    }
+
+    // SERVICE PARA CRIAÇÃO DOS MENUS
+    public async Task<Menu> CreateMenus(Menu menus)
+    {
+
+        _context.Add(menus);
+
+        try
+        {
+            await _context.SaveChangesAsync();
+            return menus;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Erro: {ex.Message}");
+            Console.WriteLine($"Inner Exception: {ex.InnerException?.Message}");
+            throw;
+        }
+
+    }
+
+    public async Task<(List<GetMenusDto> Modulo, int TotalCount, int TotalPages)> GetMenusAsync(int page = 1,
+    int pageSize = 10)
+    {
+
+        var query = _context.Menus.AsQueryable();
+
+        var totalCount = await _context.Menus.CountAsync();
+
+        var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+
+        if (page < 1) page = 1;
+        if (page > totalPages && totalPages > 0) page = totalPages;
+
+        var skip = (page - 1) * pageSize;
+
+        var menus = await query.Skip(skip).Take(pageSize)
+        .Select(u => new GetMenusDto
+        {
+            id = u.Id,
+            nmMenu = u.nmMenu,
+            snAtivo = u.SnAtivo
+        }).ToListAsync();
+
+        return (menus, totalCount, totalPages);
+    }
+
+    public async Task<GetMenusDto?> GetMenusId(uint id)
+    {
+        var menus = await _context.Menus.FindAsync(id);
+
+        if (menus == null)
+            return null;
+
+        return new GetMenusDto
+        {
+            id = menus.Id,
+            nmMenu = menus.nmMenu,
+            snAtivo = menus.SnAtivo
+        };
+    }
+
+    public async Task<Menu> EditMenusId(uint id, CreateMenusDto menusDto)
+    {
+        try
+        {
+
+            var menu = await _context.Menus.FindAsync(id);
+
+            if (menu == null)
+                throw new KeyNotFoundException($"Menu com ID {id} não encontrado");
+
+            if (!string.IsNullOrWhiteSpace(menusDto.nmMenu))
+                menu.nmMenu = menusDto.nmMenu;
+
+            if (menusDto.snAtivo.HasValue)
+                menu.SnAtivo = menusDto.snAtivo;
+
+
+            await _context.SaveChangesAsync();
+
+
+            return menu;
+        }
+        catch (KeyNotFoundException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Erro ao atualizar perfil {id}: {ex.Message}");
+            throw new Exception("Erro interno ao atualizar perfil", ex);
+        }
+    }
+
+    // CRIAR VINCULOS MENUS E MODULOS
+    public async Task<MenuModulo> VinculoMenuModuloAsync(MenuModuloDTO menuModulo)
+    {
+         var menuModulo1 = new MenuModulo
+        {
+            cd_Menu = menuModulo.cd_menu,
+            cd_Modulo = menuModulo.cd_modulo
+        };
+
+        _context.Add(menuModulo1);
+
+        try
+        {
+            await _context.SaveChangesAsync();
+            return menuModulo1;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Erro: {ex.Message}");
+            Console.WriteLine($"Inner Exception: {ex.InnerException?.Message}");
+            throw;
+        }
+        
+    }
 
 
 }

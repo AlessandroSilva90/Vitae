@@ -52,7 +52,7 @@ public class RhServices
     }
 
     public async Task<(List<Lot> Setor, int TotalCount, int TotalPages)> GetSetores(
-    string? codigo = null,
+    // string? codigo = null,
     string? nome = null,
     int page = 1,
     int pageSize = 10
@@ -60,7 +60,13 @@ public class RhServices
     {
         var query = _context.Setores.AsQueryable();
 
-        var totalCount = await _context.Setores.CountAsync();
+        // if (!string.IsNullOrEmpty(codigo))
+        //     query = query.Where(x => NormalizarLot(x.Codigo) == NormalizarLot(codigo));
+
+        if (!string.IsNullOrEmpty(nome))
+            query = query.Where(x => x.Nome.Contains(nome));
+
+        var totalCount = await query.CountAsync();
 
         var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
 
@@ -72,11 +78,7 @@ public class RhServices
         var setores = await query.Skip(skip)
             .Take(pageSize).ToListAsync();
 
-        if (!string.IsNullOrEmpty(codigo))
-            query = query.Where(x => NormalizarLot(x.Codigo) == NormalizarLot(codigo));
-
-        if (!string.IsNullOrEmpty(nome))
-            query = query.Where(x => x.Nome.Contains(nome));
+        // var query = query.Where(u => u.Nome.Contains(termo));
 
         return (setores, totalCount, totalPages);
     }
@@ -99,14 +101,34 @@ public class RhServices
 
     // A PARTIR DAQUI É O VINCULO  DE COORDENADOR A SETOR E COORDENADOR A FUNCIONÁRIOS
 
-    public async Task<CoordenadorSetor> VincularCoordSetorAsync(CoordenadorSetor COORD)
+    public async Task<List<CoordenadorSetor>> VincularCoordSetorAsync(CreateVinculoCoordenadorSetorDTO coord)
+{
+    var vinculos = new List<CoordenadorSetor>();
+    
+    foreach (var cdSetor in coord.CdSetor)
     {
-        _rhcontext.CoordenadorSetors.Add(COORD);
-
-        await _rhcontext.SaveChangesAsync();
-
-        return COORD;
+        var vinculo = new CoordenadorSetor
+        {
+            CdCoordenador = coord.CdCoordenador,
+            CdSetor = cdSetor
+        };
+        
+        _rhcontext.CoordenadorSetors.Add(vinculo);
+        vinculos.Add(vinculo);
     }
+    
+    try
+    {
+        await _rhcontext.SaveChangesAsync();
+        return vinculos;
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Erro: {ex.Message}");
+        Console.WriteLine($"Inner Exception: {ex.InnerException?.Message}");
+        throw;
+    }
+}
 
     public async Task<GetVinculoCoordenadorSetorDTO?> GetCoordenadorSetorAsync(int crachaCoordenador)
     {

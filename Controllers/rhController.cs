@@ -30,11 +30,11 @@ public class RhController : ControllerBase
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 10)
     {
-        
+
 
         try
         {
-            var (funcionarios, totalCount, totalPages) = await _funcionariosService.GetFuncionariosAsync(page,pageSize);
+            var (funcionarios, totalCount, totalPages) = await _funcionariosService.GetFuncionariosAsync(page, pageSize);
             var response = new
             {
                 Data = funcionarios,
@@ -58,7 +58,8 @@ public class RhController : ControllerBase
     }
 
     [HttpGet("funcionariosTeste")]
-    public async Task<ActionResult<GetFuncionariosDTO>> GetFuncionariosTeste(){
+    public async Task<ActionResult<GetFuncionariosDTO>> GetFuncionariosTeste()
+    {
         var func = await _funcionariosService.GetFuncionariosAsync01();
 
         return Ok(func);
@@ -73,10 +74,27 @@ public class RhController : ControllerBase
 
     // ROTA PARA TRAZER OS USUÁRIOS DO SISTEMA
     [HttpGet("usuarios")]
-    public async Task<ActionResult<List<UsuarioResponseDto>>> GetUsuarios()
+    public async Task<ActionResult<List<UsuarioResponseDto>>> GetUsuarios(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10
+    )
     {
-        var funcionarios = await _usuariosService.GetUsuariosAsync();
-        return Ok(funcionarios);
+        var (usuarios, totalCount, totalPages) = await _usuariosService.GetUsuariosAsync(page, pageSize);
+        var response = new
+        {
+            Data = usuarios,
+            Pagination = new
+            {
+                CurrentPage = page,
+                PageSize = pageSize,
+                TotalItems = totalCount,
+                TotalPages = totalPages,
+                HasNextPage = page < totalPages,
+                HasPreviousPage = page > 1
+            }
+        };
+
+        return Ok(response);
     }
 
     // ROTAS PARA TRAZER OS CARGOS
@@ -115,17 +133,17 @@ public class RhController : ControllerBase
     }
 
     // ROTAS PARA TRAZER OS SETORES
-    [HttpGet("setores")]
+    [HttpGet("setores/{nome?}")]
     public async Task<ActionResult<List<Lot>>> GetSetores(
-    [FromQuery] string? codigo = null,
-    [FromQuery] string? nome = null,
+    // [FromQuery] string? codigo = null,
+    string? nome = null,
     [FromQuery] int page = 1,
     [FromQuery] int pageSize = 10
      )
     {
-         try
+        try
         {
-            var (setores, totalCount, totalPages) = await _rhServices.GetSetores(codigo,nome,page, pageSize);
+            var (setores, totalCount, totalPages) = await _rhServices.GetSetores(nome, page, pageSize);
             var response = new
             {
                 Data = setores,
@@ -157,25 +175,65 @@ public class RhController : ControllerBase
     // }
 
     [HttpGet("usuarios/{id}")]
-    public async Task<ActionResult<Usuario>> GetUsuarioById(uint id)
+    public async Task<ActionResult<UpdateUsuarioDto>> GetUsuarioById(string id)
     {
+        try
+        {
+            
         var usuario = await _usuariosService.GetUsuariosByIdAsync(id);
         if (usuario == null)
-            return NotFound("Usuário não encontrado");
-
+            return NotFound(new { message = "Usuário não encontrado" });
         return Ok(usuario);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = ex.Message });
+        }
     }
 
     [HttpPost("cadastrarUsuario")]
-    public async Task<ActionResult<CreateUsuarioDto>> CreateUsuario(CreateUsuarioDto dto)
+    public async Task<ActionResult<UsuarioResponseDto>> CreateUsuario(CreateUsuarioDto dto)
     {
-        var usuarioCriado = await _usuariosService.CreateUsuario(dto);
-        return Ok(usuarioCriado);
+        try
+        {
+            var usuarioCriado = await _usuariosService.CreateUsuario(dto);
 
+            // Mapear para DTO de resposta (não retornar a entidade)
+            var usuarioResponse = new UsuarioResponseDto
+            {
+                Id = usuarioCriado.Id,
+                Nome = usuarioCriado.Nome,
+                Email = usuarioCriado.Email,
+                DsUsuario = usuarioCriado.Ds_Usuario,
+                SnFuncionario = usuarioCriado.Sn_Funcionario ?? false,
+                SnAtivo = usuarioCriado.Sn_Ativo ?? false,
+                DtCreate = usuarioCriado.Dt_Create,
+                Cracha = usuarioCriado.Cracha,
+                Senha = usuarioCriado.Senha
+                
+            };
+
+            return Ok(usuarioResponse);
+        }
+        catch (InvalidOperationException ex)
+        {
+            // Usuário já existe - 409 Conflict
+            return Conflict(new { message = ex.Message });
+        }
+        catch (DbUpdateException ex)
+        {
+            // Erro de banco de dados
+            return StatusCode(500, new { message = "Erro ao salvar no banco de dados" });
+        }
+        catch (Exception ex)
+        {
+            // Erro genérico
+            return StatusCode(500, new { message = "Erro interno no servidor" });
+        }
     }
 
-    [HttpPut("updateUsuario")]
-    public async Task<ActionResult<Usuario>> UpdateUsuario(uint id, UpdateUsuarioDto dto)
+    [HttpPatch("updateUsuario/{id}")]
+    public async Task<ActionResult<Usuarios>> UpdateUsuario(uint id, UpdateUsuarioDto dto)
     {
         try
         {
@@ -189,8 +247,8 @@ public class RhController : ControllerBase
 
     }
 
-    [HttpDelete("deleteUsuario")]
-    public async Task<ActionResult<Usuario>> DeleteUsuario(uint id)
+    [HttpDelete("deleteUsuario/{id}")]
+    public async Task<ActionResult<Usuarios>> DeleteUsuario(uint id)
     {
         try
         {
@@ -267,14 +325,37 @@ public class RhController : ControllerBase
 
     // A PARTIR DAQUI É O VINCULO  DE COORDENADOR A SETOR E COORDENADOR A FUNCIONÁRIOS
 
-    [HttpPost("VincularCoordenadorSetor")]
-    public async Task<ActionResult<CoordenadorSetor>> VincularCoordenadorAsync(CoordenadorSetor coord)
+   [HttpPost("VincularCoordenadorSetor")]
+public async Task<ActionResult<List<CreateVinculoCoordenadorSetorDTO>>> VincularCoordenadorAsync([FromBody] CreateVinculoCoordenadorSetorDTO coord)
+{
+    try
     {
-        var response = await _rhServices.VincularCoordSetorAsync(coord);
-        return Ok(response);
+        var responses = await _rhServices.VincularCoordSetorAsync(coord);
+        
+        // Mapear os resultados para DTO de resposta
+        var result = responses.Select(r => new CreateVinculoCoordenadorSetorDTO
+        {
+            CdCoordenador = r.CdCoordenador,
+            CdSetor = new List<string> { r.CdSetor }
+        }).ToList();
+        
+        return Ok(result);
     }
+    catch (InvalidOperationException ex)
+    {
+        return Conflict(new { message = ex.Message });
+    }
+    catch (DbUpdateException ex)
+    {
+        return StatusCode(500, new { message = "Erro ao salvar no banco de dados" });
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(500, new { message = "Erro interno no servidor" });
+    }
+}
 
-    [HttpGet("GetCoordenadorSetor")]
+    [HttpGet("GetCoordenadorSetor/{crachaCoord}")]
     public async Task<ActionResult<GetVinculoCoordenadorSetorDTO>> GetCoordenadorSetorAsync(int crachaCoord)
     {
         var response = await _rhServices.GetCoordenadorSetorAsync(crachaCoord);

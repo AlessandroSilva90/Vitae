@@ -16,31 +16,45 @@ namespace Core_Providentia_vitae.Profiles
         public UsuarioProfile()
         {
             // Mapeamento para CREATE
-            CreateMap<CreateUsuarioDto, Usuario>()
-                .ForMember(dest => dest.Sn_Funcionario, opt => opt.MapFrom(src => src.Snfuncionario))
+            CreateMap<CreateUsuarioDto, Usuarios>()
+                .ForMember(dest => dest.Sn_Funcionario, opt => opt.MapFrom(src => src.SnFuncionario))
                 .ForMember(dest => dest.Ds_Usuario, opt => opt.MapFrom(src => src.DsUsuario))
                 .ForMember(dest => dest.Dt_Create, opt => opt.MapFrom(src => DateTime.Now))
                 .ForMember(dest => dest.Sn_Ativo, opt => opt.MapFrom(src => true));
 
             // Mapeamento para UPDATE
-            CreateMap<UpdateUsuarioDto, Usuario>()
-     .ForMember(dest => dest.Sn_Ativo, opt => opt.MapFrom(src => src.Snativo))
-     .ForAllMembers(opts => opts.Condition((src, dest, srcMember) =>
-     {
-         if (srcMember == null) return false;
+            CreateMap<UpdateUsuarioDto, Usuarios>()
+    .ForMember(dest => dest.Sn_Ativo, opt => opt.MapFrom(src => src.SnAtivo))
+    .ForMember(dest => dest.Sn_Funcionario, opt => opt.MapFrom(src => src.SnFuncionario))
+    .ForMember(dest => dest.Ds_Usuario, opt => opt.MapFrom(src => src.DsUsuario))
+    .ForAllMembers(opts => opts.Condition((src, dest, srcMember) =>
+    {
+        // Regra: só mapeia se o valor NÃO for o "default" do tipo
 
-         if (srcMember is string str)
-             return !string.IsNullOrWhiteSpace(str);
+        if (srcMember == null)
+            return false;
 
-         if (srcMember is int intValue)
-             return intValue != 0;
+        var type = srcMember.GetType();
 
+        if (Nullable.GetUnderlyingType(type) != null)
+        {
+            return true;
+        }
 
-         if (srcMember is bool boolValue)
-             return true; // Sempre mapeia booleans
+        if (srcMember is string str)
+            return !string.IsNullOrWhiteSpace(str);
 
-         return true;
-     }));
+        if (srcMember is int intValue && type == typeof(int))
+            return intValue != 0;
+
+        if (srcMember is bool)
+            return true;
+
+        return true;
+    }));
+
+            CreateMap<UpdateModulesDto, Modulo>()
+            .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
         }
     }
