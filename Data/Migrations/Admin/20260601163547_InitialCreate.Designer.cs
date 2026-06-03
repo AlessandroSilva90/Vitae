@@ -8,11 +8,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Core_Providentia_vitae.Migrations.Admin
+namespace Core_Providentia_vitae.Data.Migrations.Admin
 {
     [DbContext(typeof(AdminContext))]
-    [Migration("20260310111223_AdicionarMenuModuloPerfil")]
-    partial class AdicionarMenuModuloPerfil
+    [Migration("20260601163547_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -32,11 +32,19 @@ namespace Core_Providentia_vitae.Migrations.Admin
                         .HasColumnType("int unsigned")
                         .HasColumnName("id");
 
+                    b.Property<uint>("CdMenuPai")
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("cdMenuPai");
+
                     b.Property<DateTime?>("DtCreate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
                         .HasColumnName("dt_create")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+
+                    b.Property<uint>("Ordem")
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("ordem");
 
                     b.Property<bool?>("SnAtivo")
                         .ValueGeneratedOnAdd()
@@ -59,6 +67,7 @@ namespace Core_Providentia_vitae.Migrations.Admin
             modelBuilder.Entity("Core_Providentia_vitae.Models.Admin.MenuModulo", b =>
                 {
                     b.Property<uint>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int unsigned")
                         .HasColumnName("id");
 
@@ -87,6 +96,7 @@ namespace Core_Providentia_vitae.Migrations.Admin
             modelBuilder.Entity("Core_Providentia_vitae.Models.Admin.MenuModuloPerfil", b =>
                 {
                     b.Property<uint>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int unsigned")
                         .HasColumnName("id");
 
@@ -116,7 +126,8 @@ namespace Core_Providentia_vitae.Migrations.Admin
                 {
                     b.Property<uint>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("id");
 
                     b.Property<DateTime?>("DtCreate")
                         .ValueGeneratedOnAdd()
@@ -145,10 +156,9 @@ namespace Core_Providentia_vitae.Migrations.Admin
                 {
                     b.Property<uint>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int unsigned")
-                        .HasColumnName("id");
+                        .HasColumnType("int unsigned");
 
-                    b.Property<string>("DsPefil")
+                    b.Property<string>("DsPerfil")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("varchar(255)")
@@ -175,6 +185,7 @@ namespace Core_Providentia_vitae.Migrations.Admin
             modelBuilder.Entity("Core_Providentia_vitae.Models.Admin.UsuarioModulo", b =>
                 {
                     b.Property<uint>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int unsigned")
                         .HasColumnName("id");
 
@@ -197,14 +208,14 @@ namespace Core_Providentia_vitae.Migrations.Admin
                     b.ToTable("usuario_modulos", (string)null);
                 });
 
-            modelBuilder.Entity("Core_Providentia_vitae.Models.Usuario", b =>
+            modelBuilder.Entity("Core_Providentia_vitae.Models.Usuarios", b =>
                 {
                     b.Property<uint>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int unsigned")
                         .HasColumnName("id");
 
-                    b.Property<int>("Cracha")
+                    b.Property<int?>("Cracha")
                         .HasColumnType("int");
 
                     b.Property<string>("Ds_Usuario")
@@ -243,7 +254,7 @@ namespace Core_Providentia_vitae.Migrations.Admin
 
                     b.HasKey("Id");
 
-                    b.ToTable("Usuario");
+                    b.ToTable("Usuarios");
                 });
 
             modelBuilder.Entity("Core_Providentia_vitae.Models.Admin.MenuModulo", b =>
@@ -292,7 +303,7 @@ namespace Core_Providentia_vitae.Migrations.Admin
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Core_Providentia_vitae.Models.Usuario", "Usuario")
+                    b.HasOne("Core_Providentia_vitae.Models.Usuarios", "Usuario")
                         .WithMany("UsuarioModulos")
                         .HasForeignKey("CdUsuario")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -325,7 +336,7 @@ namespace Core_Providentia_vitae.Migrations.Admin
                     b.Navigation("MenuModuloPerfils");
                 });
 
-            modelBuilder.Entity("Core_Providentia_vitae.Models.Usuario", b =>
+            modelBuilder.Entity("Core_Providentia_vitae.Models.Usuarios", b =>
                 {
                     b.Navigation("UsuarioModulos");
                 });

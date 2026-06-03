@@ -24,7 +24,6 @@ public partial class AdminContext : DbContext
     public virtual DbSet<Menu> Menus { get; set; }
     public virtual DbSet<MenuModulo> MenuModulos { get; set; }
     public virtual DbSet<MenuModuloPerfil> MenuModuloPerfils { get; set; }
-    // public virtual DbSet<TipoMen> TipoMenu { get; set; }
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -55,7 +54,7 @@ public partial class AdminContext : DbContext
 
 
             entity.Property(e => e.Id)
-                .ValueGeneratedNever()
+                .ValueGeneratedOnAdd()
                 .HasColumnName("id");
             entity.Property(e => e.CdModulo).HasColumnName("cd_modulo");
             entity.Property(e => e.CdUsuario).HasColumnName("cd_usuario");
@@ -65,6 +64,10 @@ public partial class AdminContext : DbContext
         modelBuilder.Entity<Modulo>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
+
+            entity.Property(e => e.Id)
+            .HasColumnName("id")
+            .ValueGeneratedOnAdd();  // Auto-increment
 
             entity.ToTable("modulos");
 
@@ -87,10 +90,6 @@ public partial class AdminContext : DbContext
         entity.HasKey(e => e.Id).HasName("PRIMARY");
 
         entity.ToTable("perfil");  // Nome da tabela no banco
-
-        entity.Property(e => e.Id)
-            .HasColumnName("id")
-            .ValueGeneratedOnAdd();  // Auto-increment
 
         entity.Property(e => e.DsPerfil)
             .IsRequired()
@@ -121,9 +120,17 @@ public partial class AdminContext : DbContext
                 .HasMaxLength(255)  // Defina um tamanho adequado
                 .HasColumnName("nmMenu");
 
+            entity.Property(e => e.CdMenuPai)
+                .IsRequired()
+                .HasColumnName("cdMenuPai");
+
+            entity.Property(e => e.Ordem)
+                .HasColumnName("ordem");
+
             entity.Property(e => e.SnAtivo)
                 .HasDefaultValue(true)
                 .HasColumnName("sn_ativo");
+
 
             entity.Property(e => e.DtCreate)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP(6)")
@@ -155,7 +162,7 @@ public partial class AdminContext : DbContext
 
 
               entity.Property(e => e.Id)
-                  .ValueGeneratedNever()
+                    .ValueGeneratedOnAdd()
                   .HasColumnName("id");
               entity.Property(e => e.cd_Menu).HasColumnName("cd_menu");
               entity.Property(e => e.cd_Modulo).HasColumnName("cd_modulo");
@@ -164,6 +171,7 @@ public partial class AdminContext : DbContext
         modelBuilder.Entity<MenuModuloPerfil>(entity =>
           {
               entity.HasKey(e => e.Id).HasName("PRIMARY");
+
 
               entity.ToTable("menu_modulo_perfils");
 
@@ -186,37 +194,13 @@ public partial class AdminContext : DbContext
 
 
               entity.Property(e => e.Id)
-                  .ValueGeneratedNever()
+                .ValueGeneratedOnAdd()
                   .HasColumnName("id");
               entity.Property(e => e.cdMenuModulo).HasColumnName("cd_menu_modulo");
               entity.Property(e => e.cdPerfil).HasColumnName("cd_perfil");
           });
 
-        //   modelBuilder.Entity<TipoMenu>(entity =>
-        //   {
 
-        //     entity.ToTable("TipoMenu");  // Nome da tabela no banco
-
-        //     entity.Property(e => e.Id)
-        //         .HasColumnName("id")
-        //         .ValueGeneratedOnAdd();  // Auto-increment
-
-        //     entity.Property(e => e.NmTipoMenu)
-        //         .IsRequired()
-        //         .HasMaxLength(100)  // Defina um tamanho adequado
-        //         .HasColumnName("nmTipoMenu");
-
-        //     entity.Property(e => e.DtCreate)
-        //         .HasDefaultValueSql("CURRENT_TIMESTAMP(6)")
-        //         .HasColumnName("dt_create");
-
-        //     entity.HasKey(e => e.Id).HasName("PRIMARY");
-
-        //     entity.HasIndex(e => e.Id, "IX_menu_modulos_cd_perfil");
-
-
-
-        //   });
 
 
 

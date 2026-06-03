@@ -20,7 +20,7 @@ public class ModulesController : ControllerBase
         _modulesService = modulesService;
     }
 
-    [HttpGet("getModulos")]
+    [HttpGet("Modulos")]
     public async Task<ActionResult<CreateModuleDto>> GetModulos(
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 10
@@ -55,19 +55,19 @@ public class ModulesController : ControllerBase
         return Ok(modulos);
     }
 
-    [HttpPost("cadastrarModulos")]
+    [HttpPost("Modulos")]
     public async Task<ActionResult<CreateModuleDto>> CreateModules(CreateModuleDto dto)
     {
         return Ok(await _modulesService.createModule(dto));
     }
 
-    [HttpPatch("updateModulos/{id}")]
+    [HttpPatch("Modulos/{id}")]
     public async Task<ActionResult<UpdateModulesDto>> UpdateModules(uint id, UpdateModulesDto dto)
     {
         return Ok(await _modulesService.updateModules(id, dto));
     }
 
-    [HttpDelete("deletarModulos/{id}")]
+    [HttpDelete("Modulos/{id}")]
     public async Task<ActionResult<Modulo>> DeleteUsuario(uint id)
     {
         try
@@ -259,7 +259,7 @@ public class ModulesController : ControllerBase
     [HttpPatch("menus/{id}")]
     public async Task<ActionResult<CreateMenusDto>> EditMenus(
      uint id,
-     [FromBody] CreateMenusDto updateMenus)
+     [FromBody] UpdateMenuDto updateMenus)
     {
         try
         {
@@ -287,6 +287,16 @@ public class ModulesController : ControllerBase
             Console.WriteLine($"Erro inesperado: {ex.Message}");
             return StatusCode(500, "Erro interno no servidor");
         }
+    }
+
+    // MENUS DA SIDEBAR
+        [HttpGet("sidebar")]
+    public async Task<ActionResult<GetMenusDto>> GetSidebarMenus()
+    {
+        var menu = await _modulesService.GetSidebarMenus();
+    
+
+        return Ok(menu);    
     }
 
     // CRIAR VINCULOS MENUS E MODULOS

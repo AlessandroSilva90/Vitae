@@ -224,8 +224,8 @@ public class ModulesService
         return perfil;
     }
 
- public async Task<(List<Perfil> Perfil, int TotalCount, int TotalPages)> GetPerfilAsync(int page = 1,
-    int pageSize = 10)
+    public async Task<(List<Perfil> Perfil, int TotalCount, int TotalPages)> GetPerfilAsync(int page = 1,
+       int pageSize = 10)
     {
         var query = _context.Perfils.AsQueryable();
 
@@ -242,7 +242,7 @@ public class ModulesService
         .Select(p => new Perfil
         {
             Id = p.Id,
-            DsPerfil= p.DsPerfil,
+            DsPerfil = p.DsPerfil,
             SnAtivo = p.SnAtivo
         }).ToListAsync();
 
@@ -343,8 +343,10 @@ public class ModulesService
         .Select(u => new GetMenusDto
         {
             id = u.Id,
-            nmMenu = u.nmMenu,
-            snAtivo = u.SnAtivo
+            NmMenu = u.nmMenu,
+            SnAtivo = u.SnAtivo,
+            CdMenuPai = u.CdMenuPai,
+            Ordem = u.Ordem
         }).ToListAsync();
 
         return (menus, totalCount, totalPages);
@@ -360,12 +362,15 @@ public class ModulesService
         return new GetMenusDto
         {
             id = menus.Id,
-            nmMenu = menus.nmMenu,
-            snAtivo = menus.SnAtivo
+            NmMenu = menus.nmMenu,
+            SnAtivo = menus.SnAtivo,
+            CdMenuPai = menus.CdMenuPai,
+            Ordem = menus.Ordem
+
         };
     }
 
-    public async Task<Menu> EditMenusId(uint id, CreateMenusDto menusDto)
+    public async Task<Menu> EditMenusId(uint id, UpdateMenuDto menusDto)
     {
         try
         {
@@ -375,12 +380,17 @@ public class ModulesService
             if (menu == null)
                 throw new KeyNotFoundException($"Menu com ID {id} não encontrado");
 
-            if (!string.IsNullOrWhiteSpace(menusDto.nmMenu))
-                menu.nmMenu = menusDto.nmMenu;
+            if (!string.IsNullOrWhiteSpace(menusDto.NmMenu))
+                menu.nmMenu = menusDto.NmMenu;
 
-            if (menusDto.snAtivo.HasValue)
-                menu.SnAtivo = menusDto.snAtivo;
+            if (menusDto.SnAtivo.HasValue)
+                menu.SnAtivo = menusDto.SnAtivo;
 
+            if (menusDto.CdMenuPai.HasValue && menusDto.CdMenuPai.Value > 0)
+                menu.CdMenuPai = menusDto.CdMenuPai.Value;
+
+            if (menusDto.Ordem.HasValue && menusDto.Ordem.Value > 0)
+                menu.Ordem = menusDto.Ordem.Value;
 
             await _context.SaveChangesAsync();
 
@@ -398,10 +408,59 @@ public class ModulesService
         }
     }
 
+    public async Task<List<GetMenusDto>> GetSidebarMenus()
+    {
+
+        //         SELECT * FROM menu m  
+        //  left join menu m1 on m1.cdMenuPai = m.id
+        //  where m.cdMenuPai = 0
+        //  order by m.ordem, m1.ordem
+
+        try
+{
+    // 1. Busca todos os menus ativos
+    var todosMenus = await _context.Menus
+        .Where(m => m.SnAtivo == true)
+        .OrderBy(m => m.Ordem)
+        .ToListAsync();
+
+    // 2. Separa principais e submenus
+    var menusPrincipais = todosMenus
+        .Where(m => m.CdMenuPai == 0 || m.CdMenuPai == null)
+        .OrderBy(m => m.Ordem);
+
+    // 3. Monta a estrutura hierárquica
+    var resultado = menusPrincipais.Select(menu => new GetMenusDto
+    {
+        id = menu.Id,
+        NmMenu = menu.nmMenu,
+        SnAtivo = menu.SnAtivo,
+        CdMenuPai = menu.CdMenuPai,
+        Ordem = menu.Ordem,
+        Submenus = todosMenus
+            .Where(sub => sub.CdMenuPai == menu.Id)
+            .OrderBy(sub => sub.Ordem)
+            .Select(sub => new GetMenusSubmenuDto
+            {
+                id = sub.Id,
+                NmMenu = sub.nmMenu,
+                Ordem = sub.Ordem
+            }).ToList()
+    }).ToList();
+
+    return resultado;
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"Erro ao buscar menus: {ex.Message}");
+    throw;
+}
+    }
+
     // CRIAR VINCULOS MENUS E MODULOS
     public async Task<MenuModulo> VinculoMenuModuloAsync(MenuModuloDTO menuModulo)
     {
-         var menuModulo1 = new MenuModulo
+        var menuModulo1 = new MenuModulo
         {
             cd_Menu = menuModulo.cd_menu,
             cd_Modulo = menuModulo.cd_modulo
@@ -420,7 +479,7 @@ public class ModulesService
             Console.WriteLine($"Inner Exception: {ex.InnerException?.Message}");
             throw;
         }
-        
+
     }
 
 

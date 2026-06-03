@@ -44,19 +44,50 @@ public class UpdatePerfilDto
 }
 
 // DTO PARA OS MENUS
+
+// DTO para o menu principal (com submenus)
 public class GetMenusDto
 {
-    public uint id {get;set;} 
-    public string? nmMenu {get;set;} = null!;
-    public bool? snAtivo {get;set;} = true;
+    public uint id { get; set; }
+    public string NmMenu { get; set; } = null!;
+    public bool? SnAtivo {get;set;} = true;
+    public uint? CdMenuPai { get; set; }
+    public uint Ordem { get; set; }
+    public List<GetMenusSubmenuDto> Submenus { get; set; } = new List<GetMenusSubmenuDto>();
+}
 
+// DTO para submenu (simplificado)
+public class GetMenusSubmenuDto
+{
+    public uint id { get; set; }
+    public string NmMenu { get; set; } = null!;
+    public uint Ordem { get; set; }
 }
 
 public class CreateMenusDto
 {
-    public string nmMenu {get;set;} = null!;
-    public bool? snAtivo {get;set;} = true;
+    public string NmMenu {get;set;} = null!;
+    public bool? SnAtivo {get;set;} = true;
+    public uint? CdMenuPai {get;set;}
+    public uint? Ordem {get;set;}
 
+}
+
+public class EditMenusDto
+{
+    public string NmMenu {get;set;} = null!;
+    public bool? SnAtivo {get;set;} = true;
+    public uint? CdMenuPai {get;set;}
+    public uint? Ordem {get;set;}
+
+}
+
+  public class UpdateMenuDto
+{
+    public string? NmMenu { get; set; }     
+    public bool? SnAtivo { get; set; }      
+    public uint? CdMenuPai { get; set; }    
+    public uint? Ordem { get; set; }        
 }
 
 // VINCULO MENU MODULO

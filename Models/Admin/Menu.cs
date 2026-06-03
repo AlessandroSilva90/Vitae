@@ -9,6 +9,9 @@ public partial class Menu
 
     public string nmMenu { get; set; } = null!;
 
+    public uint CdMenuPai{get;set;}
+    public uint Ordem {get;set;}
+
     public bool? SnAtivo { get; set; }
 
     public DateTime? DtCreate { get; set; }
