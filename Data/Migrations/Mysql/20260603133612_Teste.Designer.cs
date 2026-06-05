@@ -3,6 +3,7 @@ using System;
 using Core_Providentia_vitae.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Core_Providentia_vitae.Data.Migrations.Mysql
 {
     [DbContext(typeof(MysqlContext))]
-    partial class MysqlContextModelSnapshot : ModelSnapshot
+    [Migration("20260603133612_Teste")]
+    partial class Teste
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -35,7 +38,7 @@ namespace Core_Providentia_vitae.Data.Migrations.Mysql
 
                     b.Property<DateTime?>("DtCreate")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime")
                         .HasColumnName("dt_create")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
 
@@ -128,7 +131,7 @@ namespace Core_Providentia_vitae.Data.Migrations.Mysql
 
                     b.Property<DateTime?>("DtCreate")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime")
                         .HasColumnName("DtCreate")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
 
@@ -163,7 +166,7 @@ namespace Core_Providentia_vitae.Data.Migrations.Mysql
 
                     b.Property<DateTime?>("DtCreate")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime")
                         .HasColumnName("dt_create")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
 
@@ -205,72 +208,6 @@ namespace Core_Providentia_vitae.Data.Migrations.Mysql
                     b.ToTable("usuario_modulos", (string)null);
                 });
 
-            modelBuilder.Entity("Core_Providentia_vitae.Models.RH.CoordenadorSetor", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("id");
-
-                    b.Property<string>("CdCoordenador")
-                        .HasColumnType("longtext")
-                        .HasColumnName("cd_coordenador");
-
-                    b.Property<string>("CdSetor")
-                        .HasColumnType("longtext")
-                        .HasColumnName("cd_setor");
-
-                    b.Property<DateTime>("DtCreate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("dt_create")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
-
-                    b.Property<DateOnly?>("DtFim")
-                        .HasColumnType("date")
-                        .HasColumnName("dt_fim");
-
-                    b.Property<DateOnly?>("DtInicio")
-                        .HasColumnType("date")
-                        .HasColumnName("dt_inicio");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("coordenador_setor", (string)null);
-                });
-
-            modelBuilder.Entity("Core_Providentia_vitae.Models.RH.CoordenadorUsuario", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("id");
-
-                    b.Property<int>("CdCoordenador")
-                        .HasColumnType("int")
-                        .HasColumnName("cd_coordenador");
-
-                    b.Property<int>("CdFuncionario")
-                        .HasColumnType("int")
-                        .HasColumnName("cd_funcionario");
-
-                    b.Property<DateTime>("DtCreate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("dt_create")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
-
-                    b.Property<DateOnly?>("DtFim")
-                        .HasColumnType("date");
-
-                    b.Property<DateOnly?>("DtInicio")
-                        .HasColumnType("date");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("coordenador_usuario", (string)null);
-                });
-
             modelBuilder.Entity("Core_Providentia_vitae.Models.Usuarios", b =>
                 {
                     b.Property<uint>("Id")
@@ -289,20 +226,20 @@ namespace Core_Providentia_vitae.Data.Migrations.Mysql
 
                     b.Property<DateTime?>("Dt_Create")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime")
                         .HasColumnName("dt_create")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<DateTime?>("Dt_Log")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime")
                         .HasColumnName("dt_log");
 
                     b.Property<DateTime?>("Dt_Ult_Log")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime")
                         .HasColumnName("dt_ult_log");
 
                     b.Property<DateTime?>("Dt_Update")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime")
                         .HasColumnName("dt_update");
 
                     b.Property<string>("Email")

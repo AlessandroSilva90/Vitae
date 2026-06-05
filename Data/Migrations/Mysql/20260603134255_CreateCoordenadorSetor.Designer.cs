@@ -3,6 +3,7 @@ using System;
 using Core_Providentia_vitae.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Core_Providentia_vitae.Data.Migrations.Mysql
 {
     [DbContext(typeof(MysqlContext))]
-    partial class MysqlContextModelSnapshot : ModelSnapshot
+    [Migration("20260603134255_CreateCoordenadorSetor")]
+    partial class CreateCoordenadorSetor
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -35,9 +38,9 @@ namespace Core_Providentia_vitae.Data.Migrations.Mysql
 
                     b.Property<DateTime?>("DtCreate")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime")
                         .HasColumnName("dt_create")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<uint>("Ordem")
                         .HasColumnType("int unsigned")
@@ -128,9 +131,9 @@ namespace Core_Providentia_vitae.Data.Migrations.Mysql
 
                     b.Property<DateTime?>("DtCreate")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime")
                         .HasColumnName("DtCreate")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<string>("NmModulos")
                         .IsRequired()
@@ -163,9 +166,9 @@ namespace Core_Providentia_vitae.Data.Migrations.Mysql
 
                     b.Property<DateTime?>("DtCreate")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime")
                         .HasColumnName("dt_create")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<bool?>("SnAtivo")
                         .ValueGeneratedOnAdd()
@@ -222,7 +225,7 @@ namespace Core_Providentia_vitae.Data.Migrations.Mysql
 
                     b.Property<DateTime>("DtCreate")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime")
                         .HasColumnName("dt_create")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
@@ -256,9 +259,9 @@ namespace Core_Providentia_vitae.Data.Migrations.Mysql
 
                     b.Property<DateTime>("DtCreate")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime")
                         .HasColumnName("dt_create")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<DateOnly?>("DtFim")
                         .HasColumnType("date");
@@ -289,20 +292,20 @@ namespace Core_Providentia_vitae.Data.Migrations.Mysql
 
                     b.Property<DateTime?>("Dt_Create")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime")
                         .HasColumnName("dt_create")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<DateTime?>("Dt_Log")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime")
                         .HasColumnName("dt_log");
 
                     b.Property<DateTime?>("Dt_Ult_Log")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime")
                         .HasColumnName("dt_ult_log");
 
                     b.Property<DateTime?>("Dt_Update")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime")
                         .HasColumnName("dt_update");
 
                     b.Property<string>("Email")

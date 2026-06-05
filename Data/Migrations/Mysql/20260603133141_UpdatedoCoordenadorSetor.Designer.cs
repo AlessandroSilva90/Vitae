@@ -11,117 +11,145 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Core_Providentia_vitae.Data.Migrations.Mysql
 {
     [DbContext(typeof(MysqlContext))]
-    [Migration("20260601163608_TabelasMysqlContextCreate")]
-    partial class TabelasMysqlContextCreate
+    [Migration("20260603133141_UpdatedoCoordenadorSetor")]
+    partial class UpdatedoCoordenadorSetor
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
+                .UseCollation("utf8mb4_0900_ai_ci")
                 .HasAnnotation("ProductVersion", "8.0.10")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
+
+            MySqlModelBuilderExtensions.HasCharSet(modelBuilder, "utf8mb4");
 
             modelBuilder.Entity("Core_Providentia_vitae.Models.Admin.Menu", b =>
                 {
                     b.Property<uint>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("id");
 
                     b.Property<uint>("CdMenuPai")
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("cdMenuPai");
 
                     b.Property<DateTime?>("DtCreate")
-                        .HasColumnType("datetime(6)");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("dt_create")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
 
                     b.Property<uint>("Ordem")
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("ordem");
 
                     b.Property<bool?>("SnAtivo")
-                        .HasColumnType("tinyint(1)");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(true)
+                        .HasColumnName("sn_ativo");
 
                     b.Property<string>("nmMenu")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("nmMenu");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("PRIMARY");
 
-                    b.ToTable("Menu");
+                    b.ToTable("menu", (string)null);
                 });
 
             modelBuilder.Entity("Core_Providentia_vitae.Models.Admin.MenuModulo", b =>
                 {
                     b.Property<uint>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int unsigned");
-
-                    b.Property<uint>("MenuId")
-                        .HasColumnType("int unsigned");
-
-                    b.Property<uint>("ModuloId")
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("id");
 
                     b.Property<uint>("cd_Menu")
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("cd_menu");
 
                     b.Property<uint>("cd_Modulo")
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("cd_modulo");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("PRIMARY");
 
-                    b.HasIndex("MenuId");
+                    b.HasIndex(new[] { "cd_Menu" }, "IX_menu_modulos_cd_menu");
 
-                    b.HasIndex("ModuloId");
+                    b.HasIndex(new[] { "cd_Modulo" }, "IX_menu_modulos_cd_modulo");
 
-                    b.ToTable("MenuModulo");
+                    b.HasIndex(new[] { "cd_Menu" }, "cd_menu");
+
+                    b.HasIndex(new[] { "cd_Modulo" }, "cd_modulo");
+
+                    b.ToTable("menu_modulos", (string)null);
                 });
 
             modelBuilder.Entity("Core_Providentia_vitae.Models.Admin.MenuModuloPerfil", b =>
                 {
                     b.Property<uint>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int unsigned");
-
-                    b.Property<uint>("MenuModuloId")
-                        .HasColumnType("int unsigned");
-
-                    b.Property<uint>("PerfilId")
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("id");
 
                     b.Property<uint>("cdMenuModulo")
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("cd_menu_modulo");
 
                     b.Property<uint>("cdPerfil")
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("cd_perfil");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("PRIMARY");
 
-                    b.HasIndex("MenuModuloId");
+                    b.HasIndex(new[] { "cdMenuModulo" }, "IX_menu_modulos_cd_menu_modulo");
 
-                    b.HasIndex("PerfilId");
+                    b.HasIndex(new[] { "cdPerfil" }, "IX_menu_modulos_cd_perfil");
 
-                    b.ToTable("MenuModuloPerfil");
+                    b.HasIndex(new[] { "cdMenuModulo" }, "cd_menu_modulo");
+
+                    b.HasIndex(new[] { "cdPerfil" }, "cd_perfil");
+
+                    b.ToTable("menu_modulo_perfils", (string)null);
                 });
 
             modelBuilder.Entity("Core_Providentia_vitae.Models.Admin.Modulo", b =>
                 {
                     b.Property<uint>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("id");
 
                     b.Property<DateTime?>("DtCreate")
-                        .HasColumnType("datetime(6)");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("DtCreate")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
 
                     b.Property<string>("NmModulos")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("longtext")
+                        .HasColumnName("nmModulos");
 
                     b.Property<bool?>("SnAtivo")
-                        .HasColumnType("tinyint(1)");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(true)
+                        .HasColumnName("snAtivo");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("PRIMARY");
 
-                    b.ToTable("Modulo");
+                    b.ToTable("modulos", (string)null);
                 });
 
             modelBuilder.Entity("Core_Providentia_vitae.Models.Admin.Perfil", b =>
@@ -132,44 +160,52 @@ namespace Core_Providentia_vitae.Data.Migrations.Mysql
 
                     b.Property<string>("DsPerfil")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("ds_perfil");
 
                     b.Property<DateTime?>("DtCreate")
-                        .HasColumnType("datetime(6)");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("dt_create")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
 
                     b.Property<bool?>("SnAtivo")
-                        .HasColumnType("tinyint(1)");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(true)
+                        .HasColumnName("sn_ativo");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("PRIMARY");
 
-                    b.ToTable("Perfil");
+                    b.ToTable("perfil", (string)null);
                 });
 
             modelBuilder.Entity("Core_Providentia_vitae.Models.Admin.UsuarioModulo", b =>
                 {
                     b.Property<uint>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("id");
 
                     b.Property<uint>("CdModulo")
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("cd_modulo");
 
                     b.Property<uint>("CdUsuario")
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("cd_usuario");
 
-                    b.Property<uint>("ModuloId")
-                        .HasColumnType("int unsigned");
+                    b.HasKey("Id")
+                        .HasName("PRIMARY");
 
-                    b.Property<uint>("UsuarioId")
-                        .HasColumnType("int unsigned");
+                    b.HasIndex(new[] { "CdModulo" }, "cd_modulo")
+                        .HasDatabaseName("cd_modulo1");
 
-                    b.HasKey("Id");
+                    b.HasIndex(new[] { "CdUsuario" }, "cd_usuario");
 
-                    b.HasIndex("ModuloId");
-
-                    b.HasIndex("UsuarioId");
-
-                    b.ToTable("UsuarioModulo");
+                    b.ToTable("usuario_modulos", (string)null);
                 });
 
             modelBuilder.Entity("Core_Providentia_vitae.Models.Usuarios", b =>
@@ -240,13 +276,13 @@ namespace Core_Providentia_vitae.Data.Migrations.Mysql
                 {
                     b.HasOne("Core_Providentia_vitae.Models.Admin.Menu", "Menu")
                         .WithMany("MenuModulos")
-                        .HasForeignKey("MenuId")
+                        .HasForeignKey("cd_Menu")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Core_Providentia_vitae.Models.Admin.Modulo", "Modulo")
                         .WithMany("MenuModulos")
-                        .HasForeignKey("ModuloId")
+                        .HasForeignKey("cd_Modulo")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -259,13 +295,13 @@ namespace Core_Providentia_vitae.Data.Migrations.Mysql
                 {
                     b.HasOne("Core_Providentia_vitae.Models.Admin.MenuModulo", "MenuModulo")
                         .WithMany("MenuModuloPerfils")
-                        .HasForeignKey("MenuModuloId")
+                        .HasForeignKey("cdMenuModulo")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Core_Providentia_vitae.Models.Admin.Perfil", "Perfil")
                         .WithMany("MenuModuloPerfils")
-                        .HasForeignKey("PerfilId")
+                        .HasForeignKey("cdPerfil")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -278,13 +314,13 @@ namespace Core_Providentia_vitae.Data.Migrations.Mysql
                 {
                     b.HasOne("Core_Providentia_vitae.Models.Admin.Modulo", "Modulo")
                         .WithMany("UsuarioModulos")
-                        .HasForeignKey("ModuloId")
+                        .HasForeignKey("CdModulo")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Core_Providentia_vitae.Models.Usuarios", "Usuario")
                         .WithMany("UsuarioModulos")
-                        .HasForeignKey("UsuarioId")
+                        .HasForeignKey("CdUsuario")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

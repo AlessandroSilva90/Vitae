@@ -3,6 +3,7 @@ using System;
 using Core_Providentia_vitae.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Core_Providentia_vitae.Data.Migrations.Mysql
 {
     [DbContext(typeof(MysqlContext))]
-    partial class MysqlContextModelSnapshot : ModelSnapshot
+    [Migration("20260603132037_UnificarContextos")]
+    partial class UnificarContextos
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -258,7 +261,7 @@ namespace Core_Providentia_vitae.Data.Migrations.Mysql
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
                         .HasColumnName("dt_create")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<DateOnly?>("DtFim")
                         .HasColumnType("date");
@@ -291,7 +294,7 @@ namespace Core_Providentia_vitae.Data.Migrations.Mysql
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
                         .HasColumnName("dt_create")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<DateTime?>("Dt_Log")
                         .HasColumnType("datetime(6)")

@@ -12,13 +12,13 @@ namespace Core_Providentia_vitae.Services.Admin.Modules;
 
 public class ModulesService
 {
-    private readonly AdminContext _context;
+    // private readonly AdminContext _context;
     private readonly MysqlContext _contextMysql;
     private readonly IMapper _mapper;
 
-    public ModulesService(AdminContext context, IMapper mapper, MysqlContext contextMysql)
+    public ModulesService( IMapper mapper, MysqlContext contextMysql)
     {
-        _context = context;
+        // _context = context;
         _mapper = mapper;
         _contextMysql = contextMysql;
     }
@@ -27,9 +27,9 @@ public class ModulesService
     int pageSize = 10)
     {
 
-        var query = _context.Modulos.AsQueryable();
+        var query = _contextMysql.Modulos.AsQueryable();
 
-        var totalCount = await _context.Modulos.CountAsync();
+        var totalCount = await _contextMysql.Modulos.CountAsync();
 
         var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
 
@@ -49,7 +49,7 @@ public class ModulesService
         return (modulos, totalCount, totalPages);
 
 
-        // return await _context.Modulos
+        // return await _contextMysql.Modulos
         // .Select(u => new GetModulesDto
         // {
         //     id = u.Id,
@@ -61,7 +61,7 @@ public class ModulesService
     public async Task<GetModulesDto?> GetModulesId(uint id)
     {
 
-        var modulo = await _context.Modulos.FindAsync(id);
+        var modulo = await _contextMysql.Modulos.FindAsync(id);
 
         if (modulo == null)
             return null;
@@ -82,11 +82,11 @@ public class ModulesService
             SnAtivo = moduleDto.snAtivo ?? true
         };
 
-        _context.Add(modulo);
+        _contextMysql.Add(modulo);
 
         try
         {
-            await _context.SaveChangesAsync();
+            await _contextMysql.SaveChangesAsync();
             return modulo;
         }
         catch (Exception ex)
@@ -101,27 +101,27 @@ public class ModulesService
 
     public async Task<Modulo> updateModules(uint id, UpdateModulesDto updateDTO)
     {
-        var modulo = await _context.Modulos.FindAsync(id);
+        var modulo = await _contextMysql.Modulos.FindAsync(id);
 
         if (modulo == null)
             throw new Exception("Módulo não encontrado");
 
         _mapper.Map(updateDTO, modulo);
-        await _context.SaveChangesAsync();
+        await _contextMysql.SaveChangesAsync();
 
         return modulo;
     }
 
     public async Task<bool> deleteModule(uint id)
     {
-        var modulo = await _context.Modulos.FindAsync(id);
+        var modulo = await _contextMysql.Modulos.FindAsync(id);
 
         if (modulo == null)
             return false;
 
-        _context.Modulos.Remove(modulo);
+        _contextMysql.Modulos.Remove(modulo);
 
-        await _context.SaveChangesAsync();
+        await _contextMysql.SaveChangesAsync();
         return true;
     }
 
@@ -131,7 +131,7 @@ public class ModulesService
     {
         try
         {
-            var modulos = await _context.UsuarioModulos
+            var modulos = await _contextMysql.UsuarioModulos
                              .Where(m => m.CdUsuario == usuarioId)
                              .Where(m => m.Modulo.SnAtivo == true)
                              .Select(m => new GetUserModulesDto
@@ -158,12 +158,12 @@ public class ModulesService
         };
 
 
-        _context.Add(usermodulo);
+        _contextMysql.Add(usermodulo);
 
 
         try
         {
-            await _context.SaveChangesAsync();
+            await _contextMysql.SaveChangesAsync();
             return usermodulo;
         }
         catch (Exception ex)
@@ -178,7 +178,7 @@ public class ModulesService
     {
         try
         {
-            var usermodulo = await _context.UsuarioModulos
+            var usermodulo = await _contextMysql.UsuarioModulos
                 .Where(um => um.CdUsuario == idUser && um.CdModulo == idModulo)
                 .ExecuteDeleteAsync();
 
@@ -196,11 +196,11 @@ public class ModulesService
     public async Task<Perfil> CreatePerfil(Perfil perfil)
     {
 
-        _context.Add(perfil);
+        _contextMysql.Add(perfil);
 
         try
         {
-            await _context.SaveChangesAsync();
+            await _contextMysql.SaveChangesAsync();
             return perfil;
         }
         catch (Exception ex)
@@ -214,7 +214,7 @@ public class ModulesService
 
     public async Task<Perfil?> GetPerfilById(uint id)
     {
-        var perfil = await _context.Perfils.FindAsync(id);
+        var perfil = await _contextMysql.Perfils.FindAsync(id);
 
         if (perfil == null)
         {
@@ -227,9 +227,9 @@ public class ModulesService
     public async Task<(List<Perfil> Perfil, int TotalCount, int TotalPages)> GetPerfilAsync(int page = 1,
        int pageSize = 10)
     {
-        var query = _context.Perfils.AsQueryable();
+        var query = _contextMysql.Perfils.AsQueryable();
 
-        var totalCount = await _context.Menus.CountAsync();
+        var totalCount = await _contextMysql.Menus.CountAsync();
 
         var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
 
@@ -253,13 +253,13 @@ public class ModulesService
     {
         try
         {
-            var perfil = await _context.Perfils.FindAsync(id);
+            var perfil = await _contextMysql.Perfils.FindAsync(id);
             if (perfil == null)
                 return false;
 
-            _context.Perfils.Remove(perfil);
+            _contextMysql.Perfils.Remove(perfil);
 
-            await _context.SaveChangesAsync();
+            await _contextMysql.SaveChangesAsync();
             return true;
         }
         catch (Exception ex)
@@ -274,7 +274,7 @@ public class ModulesService
         try
         {
 
-            var perfil = await _context.Perfils.FindAsync(id);
+            var perfil = await _contextMysql.Perfils.FindAsync(id);
 
 
             if (perfil == null)
@@ -288,7 +288,7 @@ public class ModulesService
                 perfil.SnAtivo = updatePerfilDto.snAtivo;
 
 
-            await _context.SaveChangesAsync();
+            await _contextMysql.SaveChangesAsync();
 
 
             return perfil;
@@ -308,11 +308,11 @@ public class ModulesService
     public async Task<Menu> CreateMenus(Menu menus)
     {
 
-        _context.Add(menus);
+        _contextMysql.Add(menus);
 
         try
         {
-            await _context.SaveChangesAsync();
+            await _contextMysql.SaveChangesAsync();
             return menus;
         }
         catch (Exception ex)
@@ -328,9 +328,9 @@ public class ModulesService
     int pageSize = 10)
     {
 
-        var query = _context.Menus.AsQueryable();
+        var query = _contextMysql.Menus.AsQueryable();
 
-        var totalCount = await _context.Menus.CountAsync();
+        var totalCount = await _contextMysql.Menus.CountAsync();
 
         var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
 
@@ -354,7 +354,7 @@ public class ModulesService
 
     public async Task<GetMenusDto?> GetMenusId(uint id)
     {
-        var menus = await _context.Menus.FindAsync(id);
+        var menus = await _contextMysql.Menus.FindAsync(id);
 
         if (menus == null)
             return null;
@@ -375,7 +375,7 @@ public class ModulesService
         try
         {
 
-            var menu = await _context.Menus.FindAsync(id);
+            var menu = await _contextMysql.Menus.FindAsync(id);
 
             if (menu == null)
                 throw new KeyNotFoundException($"Menu com ID {id} não encontrado");
@@ -392,7 +392,7 @@ public class ModulesService
             if (menusDto.Ordem.HasValue && menusDto.Ordem.Value > 0)
                 menu.Ordem = menusDto.Ordem.Value;
 
-            await _context.SaveChangesAsync();
+            await _contextMysql.SaveChangesAsync();
 
 
             return menu;
@@ -419,14 +419,14 @@ public class ModulesService
         try
 {
     // 1. Busca todos os menus ativos
-    var todosMenus = await _context.Menus
+    var todosMenus = await _contextMysql.Menus
         .Where(m => m.SnAtivo == true)
         .OrderBy(m => m.Ordem)
         .ToListAsync();
 
     // 2. Separa principais e submenus
     var menusPrincipais = todosMenus
-        .Where(m => m.CdMenuPai == 0 || m.CdMenuPai == null)
+        .Where(m => m.CdMenuPai == 0)
         .OrderBy(m => m.Ordem);
 
     // 3. Monta a estrutura hierárquica
@@ -466,11 +466,11 @@ catch (Exception ex)
             cd_Modulo = menuModulo.cd_modulo
         };
 
-        _context.Add(menuModulo1);
+        _contextMysql.Add(menuModulo1);
 
         try
         {
-            await _context.SaveChangesAsync();
+            await _contextMysql.SaveChangesAsync();
             return menuModulo1;
         }
         catch (Exception ex)

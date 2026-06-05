@@ -43,10 +43,10 @@ builder.Services.AddDbContext<MysqlContext>(options =>
         new MySqlServerVersion(new Version(8, 0, 33))
     ));
 
-builder.Services.AddDbContext<AdminContext>(options =>
-    options.UseMySql(builder.Configuration.GetConnectionString("Mysql"),
-    new MySqlServerVersion(new Version(8, 0, 33))
-    ));
+// builder.Services.AddDbContext<AdminContext>(options =>
+//     options.UseMySql(builder.Configuration.GetConnectionString("Mysql"),
+//     new MySqlServerVersion(new Version(8, 0, 33))
+//     ));
 
 builder.Services.AddDbContext<RhContext>(options =>
 options.UseMySql(builder.Configuration.GetConnectionString("Mysql"),
